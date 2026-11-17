@@ -1,71 +1,34 @@
-# AgentLang
-ia feita com pyautogui
-import os
+# AgentLang — Agente de Consultas SQL
 
-from dotenv import load_dotenv
-from langchain.tools import tool
-from langchain_community.utilities import SQLDatabase
-from langchain_openai import ChatOpenAI
-from langgraph.prebuilt import create_react_agent
+**Autor:** Kaiky Yoshio Ono Marins  
+**Categoria:** Python · Agentes de IA · SQL  
+**Status:** Protótipo de estudo
 
-# Lendo a variavel local de ambiente (.env)
-load_dotenv()
+## Visão geral
 
-db = SQLDatabase.from_uri("sqlite:///locadora.db")
+Experimento de agente conversacional que recebe perguntas em linguagem natural e consulta um banco SQLite de uma locadora. O projeto usa LangGraph para organizar o agente e uma ferramenta Python para executar consultas SQL.
 
-schema = db.get_table_info(
-    table_names=[
-        "Cliente",
-        "Filme",
-        "ItemLocacao"
-    ]
-)
+## O que demonstra
 
-@tool
-def execute_sql(query: str) -> str:
-    """
-    Executa consultas SQL
-    """
-    print("\nSQL: ")
-    print(query)
-    return db.run(query)
+- Integração de um modelo de linguagem com LangGraph.
+- Leitura do esquema de tabelas do banco.
+- Ferramenta de consulta SQL chamada pelo agente.
+- Respostas em português com explicação dos resultados.
 
-llm = ChatOpenAI(
-    base_url="https://integrate.api.nvidia.com/v1",
-    api_key=os.getenv("NVIDIA_API_KEY"),
-    model="meta/llama-3.3-70b-instruct",
-    temperature=0
-)
+## Tecnologias
 
-SYSTEM_PROMPT = f"""
-Voce é um especialista em Linguagem SQL.
-Banco Disponivel: {schema}
+- Python
+- LangGraph e LangChain
+- SQLite
+- SDK compatível com OpenAI
+- NVIDIA NIM
 
-regras:
-- Utilize execute_sql.
-- Use apenas SELECT.
-- Responda em portugues.
-- Mostre os Dados retornados pela Consulta.
-- Não escreva apenas o formato do resultado.
-- Sempre apresente os valores encontrados.
-- Por fim Explique os resultados encontrados em linguagem natural portugues do Brasil.
-"""
+## Banco de dados esperado
 
-agent = create_react_agent(
-    model=llm,
-    tools=[execute_sql],
-    prompt=SYSTEM_PROMPT
-)
+O exemplo referencia um arquivo local `locadora.db` com as tabelas `Cliente`, `Filme` e `ItemLocacao`. Esse banco não está incluído neste repositório; é necessário disponibilizá-lo localmente antes de executar.
 
-while True:
-    pergunta = input("\nPergunta: ")
-    if pergunta.lower() == "sair":
-        break
-    resposta = agent.invoke({
-        "messages": [{
-            "role": "user",
-            "content": pergunta
-        }]
-    })
-    print("\nResposta:")
-    print(resposta["messages"][-1].content)
+## Material e segurança
+
+O código original está em [MATERIAL-ORIGINAL.txt](./MATERIAL-ORIGINAL.txt). A instrução do agente orienta o uso de consultas `SELECT`; revise e valide as consultas antes de conectar o protótipo a dados reais. Configure `NVIDIA_API_KEY` no ambiente local e não publique credenciais.
+
+© 2026 Kaiky Yoshio Ono Marins.
